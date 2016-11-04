@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint ./",
-    "watch": "gulp watch | bunyan"
+    "watch": "gulp watch | bunyan",
+    "build": "gulp",
+    "start": "node www.js | bunyan"
   },
   "bin": "www.js",
   "keywords": [],
