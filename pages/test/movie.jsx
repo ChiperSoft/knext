@@ -2,7 +2,7 @@
 import React, { PropTypes } from 'react';
 import request from '../../models/superagent';
 
-export const path = '/test/:movieid';
+export const path = '/test/movie/:movieid';
 export const method = 'get';
 export async function loadInitialState (req) {
 	var movie = await request.get(`http://www.omdbapi.com/?i=${req.params.movieid}&tomatoes=true`).then((res) => res.body);

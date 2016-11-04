@@ -28,6 +28,7 @@ app.use(reactExpress.renderer);
 var router = express.Router();
 var pagesPath = resolve(__dirname, '..', 'pages');
 log.debug('Loading pages from', pagesPath);
+var mountedPaths = {};
 glob.sync(join(pagesPath, '**', '*.js')).forEach((pagePath) => {
 	// skip pages starting with an underscore
 	if (basename(pagePath)[0] === '_') return;
@@ -38,9 +39,26 @@ glob.sync(join(pagesPath, '**', '*.js')).forEach((pagePath) => {
 	var middleware = page.middleware || [];
 
 	if (!path) throw new Error(`Page ${pagePath} is missing a path.`);
+	if (mountedPaths.hasOwnProperty(path) && mountedPaths[path] === method) {
+		throw new Error(`Page ${pagePath} cannot be mounted for ${method} requests, a page is already mounted at ${path}`);
+	}
+	mountedPaths[path] = method;
 	async function handler (req, res, next) {
 		try {
-			var initialState = await (page.loadInitialState ? page.loadInitialState(req) : {});
+			var initialState = await (page.loadInitialState ? page.loadInitialState(req, res) : {});
+			if (initialState === false) return next();
+			if (initialState === true) return;
+			if (typeof initialState !== 'object') throw new Error(`${pagePath}.loadInitialState returned a non-object`);
+			initialState = Object.assign({}, initialState, {
+				ctx: {
+					url: req.originalUrl,
+					headers: req.headers,
+					cookies: req.cookies,
+					params: req.params,
+					query: req.query,
+					body: req.body,
+				},
+			});
 			res.render(page.default, initialState);
 		} catch (e) {
 			next(e);
