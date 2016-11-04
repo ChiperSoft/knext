@@ -1,0 +1,10 @@
+{
+	"parser": "babel-eslint",
+	"extends": ["chiper/react", "chiper/rules/node"],
+	"env": {
+		"node": true
+	},
+	"rules": {
+		"node/no-unsupported-features": "off"
+	}
+}

@@ -1,0 +1,7 @@
+{
+	"parser": "babel-eslint",
+	"extends": ["chiper/react"],
+	"rules": {
+		"node/no-unsupported-features": "off"
+	}
+}
