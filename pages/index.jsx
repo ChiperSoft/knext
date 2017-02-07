@@ -11,25 +11,23 @@ const TestPage = ({ ctx }) =>
 
 		<b>Query:</b>
 		<ul>
-			{map(ctx.query, (value, key) => <li><em>{key}</em>: {value}</li>)}
+			{map(ctx.query, (value, key) => <li key={key}><em>{key}</em>: {value}</li>)}
 		</ul>
 
 		<b>Body:</b>
 		<ul>
-			{ctx.body && map(ctx.body, (value, key) => <li><em>{key}</em>: {value}</li>)}
+			{ctx.body && map(ctx.body, (value, key) => <li key={key}><em>{key}</em>: {value}</li>)}
 		</ul>
 
 		<b>Headers:</b>
 		<ul>
-			{map(ctx.headers, (value, key) => <li><em>{key}</em>: {value}</li>)}
+			{map(ctx.headers, (value, key) => <li key={key}><em>{key}</em>: {value}</li>)}
 		</ul>
 
 		<b>Cookies:</b>
 		<ul>
-			{map(ctx.cookies, (value, key) => <li><em>{key}</em>: {value}</li>)}
+			{map(ctx.cookies, (value, key) => <li key={key}><em>{key}</em>: {value}</li>)}
 		</ul>
-
-
 	</div>;
 
 TestPage.propTypes = {
