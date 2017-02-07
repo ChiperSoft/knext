@@ -9,9 +9,9 @@ var forever    = require('forever-monitor');
 var del        = require('del');
 
 
-var debug = require('through2').obj(function (file, enc, next) {
+var debug = require('through2').obj(function (file, enc, next) { // eslint-disable-line no-unused-vars
 	var details = Object.assign({ path: file.path, relative: file.relative }, file);
-	console.log(details);
+	console.log(details); // eslint-disable-line
 	this.push(file);
 	next();
 });
