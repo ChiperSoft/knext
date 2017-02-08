@@ -38,19 +38,7 @@ export default class Html extends Component {
 
 					<script src={assets('/assets/vendor.js')} charSet="UTF-8" />
 					<script src={assets('/assets/externalRequire.js')} charSet="UTF-8" />
-					this.props.pagePath && <script src={assets('/assets/' + this.props.pagePath)} charSet="UTF-8" />
-
-					<script
-						dangerouslySetInnerHTML={{ __html: `
-							externalRequire(['react', 'react-dom', '${this.props.pagePath}'], function (React, render, Page) {
-								var store = window.__INITIAL_STATE__;
-								window.__INITIAL_STATE__ = null;
-
-								render(React.createElement(Page, store), document.getElementById('body'));
-							});
-						`}}
-						charSet="UTF-8"
-					/>
+					{this.props.pagePath && <script src={assets('/assets/' + this.props.pagePath)} charSet="UTF-8" />}
 				</body>
 			</html>
 		);

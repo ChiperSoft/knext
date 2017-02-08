@@ -15,12 +15,10 @@ babelConfig.plugins.pop(); // pop off transform-es2015-modules-commonjs
 
 var pages = glob.sync(joinpath('pages', '**', '*.jsx'), { cwd: __dirname });
 
-exports.entry = {
-	'externalRequire.js': 'expose-loader?externalRequire!lib/external-require',
-};
+exports.entry = {};
 
 for (const p of pages) {
-	exports.entry[p.replace('.jsx', '.js')] = joinpath('.', p);
+	exports.entry[p.replace('.jsx', '.js')] = `./webpack/page!${joinpath('.', p)}`;
 }
 
 exports.plugins = [
@@ -38,14 +36,6 @@ exports.output = {
 	libraryTarget: 'var',
 };
 
-// exports.externals = [
-// 	'react',
-// 	'react-dom',
-// 	{
-// 		[require.resolve('react')]: 'react',
-// 	},
-// ];
-
 exports.resolve = {
 	modules: [
 		__dirname,
@@ -59,10 +49,6 @@ exports.module = {
 			test: /\.jsx?$/,
 			loader: 'babel-loader',
 			options: babelConfig,
-		},
-		{
-			test: require.resolve('./lib/external-require'),
-			loader: 'expose-loader?externalRequire',
 		},
 	],
 };

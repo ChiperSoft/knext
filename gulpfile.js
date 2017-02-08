@@ -19,7 +19,8 @@ var debug = require('through2').obj(function (file, enc, next) { // eslint-disab
 	next();
 });
 
-const JSX_CODE = '+(server|pages|components|lib)/**/*.js?(x)';
+const SERVER_CODE = '+(server|pages|components|lib)/**/*.js?(x)';
+const CLIENT_CODE = '+(pages|components|webpack)/**/*.js?(x)';
 
 module.exports = exports = {
 
@@ -28,7 +29,7 @@ module.exports = exports = {
 	},
 
 	compileServer () {
-		return gulp.src(JSX_CODE)
+		return gulp.src(SERVER_CODE)
 			.pipe(cache('babel'))
 			.pipe(sourcemaps.init())
 			.pipe(babel())
@@ -39,7 +40,7 @@ module.exports = exports = {
 	compileClient (callback) {
 		webpack(webpackConfig, (err, stats) => {
 			if (err) throw new gutil.PluginError('webpack', err);
-			gutil.log('[webpack]', stats.toString());
+			// gutil.log('[webpack]', stats.toString());
 			callback();
 		});
 	},
@@ -62,11 +63,13 @@ module.exports = exports = {
 
 		var reload = debounce(() => { server.restart(); }, 500);
 
-		gulp.watch(JSX_CODE, gulp.series(
-			gulp.parallel(
-				exports.compileServer,
-				exports.compileClient
-			),
+		gulp.watch(SERVER_CODE, gulp.series(
+			exports.compileServer,
+			(done) => { reload(); done(); }
+		));
+
+		gulp.watch(CLIENT_CODE, gulp.series(
+			exports.compileClient,
 			(done) => { reload(); done(); }
 		));
 
