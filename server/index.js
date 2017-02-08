@@ -1,6 +1,6 @@
 
 var config        = require('config');
-var { resolve, join, basename }   = require('path');
+var { resolve, join, basename, relative }   = require('path');
 var express       = require('express');
 var cookieParser  = require('cookie-parser');
 var bodyParser    = require('body-parser');
@@ -59,7 +59,7 @@ glob.sync(join(pagesPath, '**', '*.js')).forEach((pagePath) => {
 					body: req.body,
 				},
 			});
-			res.render(page.default, initialState);
+			res.render(page.default, initialState, 'pages/' + relative(pagesPath, pagePath));
 		} catch (e) {
 			next(e);
 		}

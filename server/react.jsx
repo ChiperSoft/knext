@@ -10,9 +10,9 @@ function assets (path) {
 export function renderer (req, res, next) {
 	if (res.render.isReact) return next();
 
-	res.render = function (Page, store) {
+	res.render = function (Page, store, pagePath) {
 		var html = '<!DOCTYPE html>' + renderToStaticMarkup(
-			<Html assets={assets} initialState={store}>
+			<Html assets={assets} initialState={store} pagePath={pagePath}>
 				<Page {...store} />
 			</Html>
 		);

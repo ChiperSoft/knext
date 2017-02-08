@@ -4,10 +4,13 @@ var gulp       = require('gulp');
 var cache      = require('gulp-cached');
 var babel      = require('gulp-babel');
 var sourcemaps = require('gulp-sourcemaps');
+var webpack    = require('webpack');
 var debounce   = require('lodash/debounce');
 var forever    = require('forever-monitor');
 var del        = require('del');
+var gutil      = require('gulp-util')
 
+var webpackConfig = require('./webpack.js');
 
 var debug = require('through2').obj(function (file, enc, next) { // eslint-disable-line no-unused-vars
 	var details = Object.assign({ path: file.path, relative: file.relative }, file);
@@ -16,7 +19,7 @@ var debug = require('through2').obj(function (file, enc, next) { // eslint-disab
 	next();
 });
 
-const JSX_CODE = '+(server|pages|components)/**/*.js?(x)';
+const JSX_CODE = '+(server|pages|components|lib)/**/*.js?(x)';
 
 module.exports = exports = {
 
@@ -31,6 +34,14 @@ module.exports = exports = {
 			.pipe(babel())
 			.pipe(sourcemaps.write())
 			.pipe(gulp.dest('dist'));
+	},
+
+	compileClient (callback) {
+		webpack(webpackConfig, (err, stats) => {
+			if (err) throw new gutil.PluginError('webpack', err);
+			gutil.log('[webpack]', stats.toString());
+			callback();
+		});
 	},
 
 	copyModels () {
@@ -52,7 +63,10 @@ module.exports = exports = {
 		var reload = debounce(() => { server.restart(); }, 500);
 
 		gulp.watch(JSX_CODE, gulp.series(
-			exports.compileServer,
+			gulp.parallel(
+				exports.compileServer,
+				exports.compileClient
+			),
 			(done) => { reload(); done(); }
 		));
 
@@ -63,7 +77,7 @@ module.exports = exports = {
 
 exports.build = gulp.series(
 	exports.clean,
-	gulp.parallel(exports.compileServer, exports.copyModels)
+	gulp.parallel(exports.compileServer, exports.copyModels, exports.compileClient)
 );
 
 gulp.task('default', gulp.parallel(
