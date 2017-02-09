@@ -22,7 +22,11 @@ for (const p of pages) {
 }
 
 exports.plugins = [
-	new LodashModuleReplacementPlugin(),
+	new LodashModuleReplacementPlugin({
+		collections: true,
+		paths: true,
+		currying: true,
+	}),
 	new webpack.DefinePlugin({
 		'process.env.NODE_ENV': JSON.stringify('production'),
 	}),
