@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(reactExpress.renderer);
 
 var router = express.Router();
-var pagesPath = resolve(__dirname, '..', 'pages');
+var pagesPath = resolve(__dirname, '..', 'routes');
 log.debug('Loading pages from', pagesPath);
 var mountedPaths = {};
 glob.sync(join(pagesPath, '**', '*.js')).forEach((pagePath) => {

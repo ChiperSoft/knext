@@ -8,7 +8,7 @@ var webpack    = require('webpack');
 var debounce   = require('lodash/debounce');
 var forever    = require('forever-monitor');
 var del        = require('del');
-var gutil      = require('gulp-util')
+var gutil      = require('gulp-util');
 
 var webpackConfig = require('./webpack.js');
 
@@ -19,7 +19,7 @@ var debug = require('through2').obj(function (file, enc, next) { // eslint-disab
 	next();
 });
 
-const SERVER_CODE = '+(server|pages|components|lib)/**/*.js?(x)';
+const SERVER_CODE = '+(server|pages|routes|components|lib)/**/*.js?(x)';
 const CLIENT_CODE = '+(pages|components|webpack)/**/*.js?(x)';
 
 module.exports = exports = {
@@ -38,7 +38,7 @@ module.exports = exports = {
 	},
 
 	compileClient (callback) {
-		webpack(webpackConfig, (err, stats) => {
+		webpack(webpackConfig, (err, stats) => { // eslint-disable-line no-unused-vars
 			if (err) throw new gutil.PluginError('webpack', err);
 			// gutil.log('[webpack]', stats.toString());
 			callback();

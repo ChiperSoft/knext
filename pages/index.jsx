@@ -2,10 +2,7 @@
 import React, { PropTypes } from 'react';
 import { map } from 'lodash';
 
-export const path = '/';
-export const method = 'all';
-
-const TestPage = ({ ctx }) =>
+const Page = ({ ctx }) =>
 	<div>
 		<h1>This is the front page</h1>
 
@@ -30,11 +27,11 @@ const TestPage = ({ ctx }) =>
 		</ul>
 	</div>;
 
-TestPage.propTypes = {
+Page.propTypes = {
 	ctx: PropTypes.shape({
 		headers: PropTypes.object,
 		query: PropTypes.object,
 	}),
 };
 
-export default TestPage;
+export default Page;
