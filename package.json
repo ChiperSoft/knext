@@ -19,6 +19,7 @@
     "bluebird": "~3.4.7",
     "body-parser": "~1.16.0",
     "boom": "~4.2.0",
+    "bootstrap": "~4.0.0-alpha.6",
     "bunyan": "~1.8.5",
     "config": "~1.25.1",
     "cookie-parser": "~1.4.3",
@@ -37,6 +38,7 @@
     "superagent-as-promised": "~4.0.0"
   },
   "devDependencies": {
+    "autoprefixer": "~6.7.2",
     "babel-core": "~6.22.1",
     "babel-eslint": "~7.1.1",
     "babel-loader": "~6.2.10",
@@ -71,10 +73,13 @@
     "gulp-cached": "~1.1.1",
     "gulp-concat": "~2.6.1",
     "gulp-filter": "~5.0.0",
+    "gulp-postcss": "~6.3.0",
+    "gulp-sass": "~3.1.0",
     "gulp-sourcemaps": "~2.4.1",
     "gulp-util": "~3.0.8",
     "gulp-webpack": "~1.5.0",
     "lodash-webpack-plugin": "~0.11.0",
+    "postcss-modules": "~0.6.4",
     "through2": "~2.0.3",
     "webpack": "~2.2.1"
   },

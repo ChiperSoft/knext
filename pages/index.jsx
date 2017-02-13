@@ -1,9 +1,10 @@
 
 import React, { PropTypes } from 'react';
 import { map } from 'lodash';
+import styles from './index.css';
 
 const Page = ({ ctx }) =>
-	<div>
+	<div className={styles.root}>
 		<h1>This is the front page</h1>
 
 		<b>Query:</b>
@@ -17,7 +18,7 @@ const Page = ({ ctx }) =>
 		</ul>
 
 		<b>Headers:</b>
-		<ul>
+		<ul className="headers">
 			{map(ctx.headers, (value, key) => <li key={key}><em>{key}</em>: {value}</li>)}
 		</ul>
 

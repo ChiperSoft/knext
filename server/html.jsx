@@ -22,8 +22,8 @@ export default class Html extends Component {
 		return (
 			<html lang="en-us">
 				<head>
-					<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css" />
-					{/* <link rel="stylesheet" href={assets('/build/style.css')} /> */}
+					<link rel="stylesheet" href={assets('/assets/main.css')} />
+					<link rel="stylesheet" href={assets('/assets/modules.css')} />
 					{title}{meta}{link}
 				</head>
 				<body>
@@ -37,7 +37,6 @@ export default class Html extends Component {
 					/>
 
 					<script src={assets('/assets/vendor.js')} charSet="UTF-8" />
-					<script src={assets('/assets/externalRequire.js')} charSet="UTF-8" />
 					{this.props.pagePath && <script src={assets('/assets/' + this.props.pagePath)} charSet="UTF-8" />}
 				</body>
 			</html>
