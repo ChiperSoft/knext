@@ -11,12 +11,14 @@ var concat     = require('gulp-concat');
 var sass       = require('gulp-sass');
 var modules    = require('postcss-modules');
 var autoprefixer = require('autoprefixer');
+var rename     = require('gulp-rename');
 
 var through    = require('through2');
 var webpack    = require('webpack');
 var debounce   = require('lodash/debounce');
 var forever    = require('forever-monitor');
 var del        = require('del');
+var Path       = require('path');
 
 var webpackConfig = require('./webpack.js');
 
@@ -131,6 +133,12 @@ module.exports = exports = {
 
 			// save out the compiled css and the json file
 			.pipe(fjson)
+			.pipe(rename((path) => {
+				var ext = Path.extname(path.basename);
+				if (ext !== '.css') return;
+				var bn = Path.basename(path.basename, ext);
+				path.basename = `${bn}.scss`;
+			}))
 			.pipe(gulp.dest('dist'))
 			.pipe(fjson.restore)
 

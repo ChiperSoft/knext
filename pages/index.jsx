@@ -1,7 +1,7 @@
 
 import React, { PropTypes } from 'react';
 import { map } from 'lodash';
-import styles from './index.css';
+import styles from './index.scss';
 
 const Page = ({ ctx }) =>
 	<div className={styles.root}>
