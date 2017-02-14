@@ -7,7 +7,7 @@ const Page = ({ ctx }) =>
 	<div className={styles.root}>
 		<h1>This is the front page</h1>
 
-		<b>Query:</b>
+		<b><i className="material-icons">help</i> Query :</b>
 		<ul>
 			{map(ctx.query, (value, key) => <li key={key}><em>{key}</em>: {value}</li>)}
 		</ul>

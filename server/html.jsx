@@ -24,6 +24,7 @@ export default class Html extends Component {
 				<head>
 					<link rel="stylesheet" href={assets('/assets/main.css')} />
 					<link rel="stylesheet" href={assets('/assets/modules.css')} />
+					<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 					{title}{meta}{link}
 				</head>
 				<body>
