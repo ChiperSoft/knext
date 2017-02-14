@@ -8,6 +8,7 @@ var glob = require('glob');
 var fs = require('fs');
 
 var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var babelConfig = JSON.parse(fs.readFileSync(resolve(__dirname, '.babelrc'), 'utf8'));
 
@@ -32,6 +33,7 @@ exports.plugins = [
 	}),
 	new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.js' }),
 	new webpack.optimize.OccurrenceOrderPlugin(),
+	new ExtractTextPlugin('[name].css'),
 ];
 
 exports.output = {
@@ -49,6 +51,39 @@ exports.resolve = {
 
 exports.module = {
 	rules: [
+		{
+			test: /\.css$/,
+			loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader' }),
+		},
+		{
+			test: /\.scss$/,
+			loader: ExtractTextPlugin.extract({
+				fallback: 'style-loader',
+				use: [
+					{
+						loader: 'css-loader',
+						options: {
+							importLoaders: 1,
+							sourceMap: 'inline',
+							modules: false,
+							localIdentName: '[path][name]--[local]',
+						},
+					},
+					{
+						loader: 'postcss-loader',
+						options: {
+							sourceMap: 'inline',
+							plugins: () => [
+								require('autoprefixer'),
+							],
+						},
+					},
+					{
+						loader: 'sass-loader',
+					},
+				],
+			}),
+		},
 		{
 			test: /\.jsx?$/,
 			loader: 'babel-loader',

@@ -23,7 +23,6 @@ export default class Html extends Component {
 			<html lang="en-us">
 				<head>
 					<link rel="stylesheet" href={assets('/assets/main.css')} />
-					<link rel="stylesheet" href={assets('/assets/modules.css')} />
 					<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 					{title}{meta}{link}
 				</head>
@@ -39,6 +38,7 @@ export default class Html extends Component {
 
 					<script src={assets('/assets/vendor.js')} charSet="UTF-8" />
 					{this.props.pagePath && <script src={assets('/assets/' + this.props.pagePath)} charSet="UTF-8" />}
+					{this.props.pagePath && <link rel="stylesheet" href={assets('/assets/' + this.props.pagePath + '.css')} charSet="UTF-8" />}
 				</body>
 			</html>
 		);

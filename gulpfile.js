@@ -100,6 +100,7 @@ module.exports = exports = {
 				modules({
 					getJSON: getJSONFromCssModules,
 					scopeBehaviour: 'global',
+					generateScopedName: '[path][name]--[local]',
 				}),
 				autoprefixer({
 					browsers: [ 'last 2 versions' ],
