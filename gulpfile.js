@@ -12,6 +12,7 @@ var sass       = require('gulp-sass');
 var modules    = require('postcss-modules');
 var autoprefixer = require('autoprefixer');
 var rename     = require('gulp-rename');
+var rev        = require('gulp-rev');
 
 var through    = require('through2');
 var webpack    = require('webpack');
@@ -155,6 +156,33 @@ module.exports = exports = {
 			.pipe(gulp.dest('dist/models'));
 	},
 
+	cachebusting () {
+		return gulp.src('dist/public/**/*.+(css|js)')
+			.pipe(rev())
+			.pipe(through.obj(function (file, enc, next) {
+				// gulp-rev doesn't support defining a path prefix for its output, so we have to
+				// trick it into putting the full public url.
+
+				// Change rev's original base path to the public root so that it uses the full public
+				// path as the original file name key in the manifest, as well as in css substitution
+				file.revOrigBase = Path.join(__dirname, '/dist/public');
+
+				// Change rev's target path to include /rev before the paths.
+				file.path = file.path.replace(Path.join(__dirname, '/dist/public'), Path.join(__dirname, '/dist/public/rev'));
+				file.base = Path.join(__dirname, '/dist/public');
+
+				this.push(file);
+				next();
+			}))
+
+			// have to write out to public root because /rev is now appended to all file urls.
+			.pipe(gulp.dest('dist/public'))
+
+			// manifest can be saved normally
+			.pipe(rev.manifest('rev-manifest.json'))
+			.pipe(gulp.dest('dist/server'));
+	},
+
 	launch () {
 		var server = new forever.Monitor('./www.js', {
 			max: 1,
@@ -176,6 +204,7 @@ module.exports = exports = {
 		gulp.watch('+(pages|components|scss)/**/*.?(s)css', gulp.series(
 			exports.compileCssModules,
 			exports.compileClient,
+			exports.cachebusting,
 			(done) => { reload(); done(); }
 		));
 
@@ -197,7 +226,8 @@ exports.build = gulp.series(
 		exports.compileServer,
 		exports.copyModels,
 		exports.compileClient
-	)
+	),
+	exports.cachebusting
 );
 
 gulp.task('default', gulp.parallel(
