@@ -1,7 +1,7 @@
 'use strict';
 
 var webpack = require('webpack');
-var { join: pathJoin, resolve: pathResolve, basename } = require('path');
+var { join: pathJoin, resolve: pathResolve } = require('path');
 var glob = require('glob');
 
 var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
@@ -9,29 +9,20 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 var babelConfig = require('./babel.config.js').clientSide;
 
-function recursiveIssuer (m) {
-	if (m.issuer) {
-		return recursiveIssuer(m.issuer);
-	}
-	if (m.name) {
-		return m.name;
-	}
-	return false;
-}
-
 var pages = glob.sync(pathJoin('pages', '**', '*.jsx'), { cwd: __dirname });
 const entry = {};
 const cacheGroups = {};
 for (const p of pages) {
 	entry[p.replace('.jsx', '.js')] = `./webpack/page!${pathJoin('.', p)}`;
-	cacheGroups[p] = {
-		filename: basename(p).replace('.jsx', '.css'),
-		name: p,
-		test: (m, c, entryName = p) => m.constructor.name === 'CssModule' && recursiveIssuer(m) === entryName,
-		chunks: 'all',
-		enforce: true,
-	};
 }
+
+cacheGroups.vendor = {
+	test: /node_modules/,
+	chunks: 'all',
+	name: 'vendor',
+	filename: 'vendor.js',
+	enforce: true,
+};
 
 module.exports = exports = function (env) {
 	var mode;
@@ -59,7 +50,11 @@ module.exports = exports = function (env) {
 		resolve,
 		module,
 		optimization: {
+			runtimeChunk: { name: 'runtime.js' },
 			splitChunks: {
+				chunks: 'all',
+				maxInitialRequests: Infinity,
+				minSize: 0,
 				cacheGroups,
 			},
 		},
@@ -76,7 +71,7 @@ exports.plugins = [
 		paths: true,
 	}),
 	new webpack.DefinePlugin({
-		'process.env.NODE_ENV': JSON.stringify('production'),
+		'process.env.BUILD_DATE': JSON.stringify(new Date()),
 	}),
 	new MiniCssExtractPlugin(),
 ];

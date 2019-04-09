@@ -34,7 +34,7 @@ var debug = require('through2').obj(function (file, enc, next) { // eslint-disab
 
 const SERVER_CODE = '+(server|pages|routes|components|lib)/**/*.js?(x)';
 const CLIENT_CODE = '+(pages|components|webpack)/**/*.js?(x)';
-// const CSS_MODULES = '+(pages|components|scss)/**/*.?(s)css';
+const CSS_MODULES = '+(pages|components)/**/*.?(s)css';
 const CSS_MAIN    = '+(scss)/**/*.?(s)css';
 
 module.exports = exports = {
@@ -108,7 +108,7 @@ module.exports = exports = {
 
 		// our modules are located in component folders inside shared
 		// ex: source/shared/components/header/styles.css
-		return gulp.src('+(pages|components)/**/*.?(s)css')
+		return gulp.src(CSS_MODULES)
 
 			.pipe(gap.prependText(`
 				@import "scss/mixins";
@@ -172,13 +172,13 @@ module.exports = exports = {
 				path.basename = `${bn}.scss`;
 			}))
 			.pipe(gulp.dest('dist'))
-			// .pipe(fjson.restore)
+			.pipe(fjson.restore)
 
-		// filter out everything except the css and concat it into a single
-		// modules file that will be hosted publicly.
-		// .pipe(fcss)
-		// .pipe(concat('modules.css'))
-		// .pipe(gulp.dest('dist/public/assets'))
+			// filter out everything except the css and concat it into a single
+			// modules file that will be hosted publicly.
+			.pipe(fcss)
+			.pipe(concat('modules.css'))
+			.pipe(gulp.dest('dist/public/assets'))
 		;
 	},
 

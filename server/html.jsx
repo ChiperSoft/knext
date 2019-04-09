@@ -26,6 +26,7 @@ export default class Html extends Component {
 					<link rel="stylesheet" href={assets('/assets/main.css')} />
 					<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 					{title}{meta}{link}
+					{this.props.pagePath && <link rel="stylesheet" href={assets(`/assets/${this.props.pagePath}.css`)} charSet="UTF-8" />}
 				</head>
 				<body>
 					{/* Content div where the client-side will take over the loading from the server */}
@@ -37,9 +38,9 @@ export default class Html extends Component {
 						charSet="UTF-8"
 					/>
 
+					<script src={assets('/assets/runtime.js')} charSet="UTF-8" />
 					<script src={assets('/assets/vendor.js')} charSet="UTF-8" />
 					{this.props.pagePath && <script src={assets('/assets/' + this.props.pagePath)} charSet="UTF-8" />}
-					{this.props.pagePath && <link rel="stylesheet" href={assets(`/assets/${this.props.pagePath}.css`)} charSet="UTF-8" />}
 				</body>
 			</html>
 		);
