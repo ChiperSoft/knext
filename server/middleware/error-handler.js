@@ -8,7 +8,10 @@ module.exports = exports = function errorHandler (err, req, res, next) { // esli
 
 	if (!err.isBoom) {
 		req.log.error(err);
-		err = boom.wrap(err, !res.statusCode || res.statusCode < 400 ? 500 : res.statusCode, err.message);
+		err = boom.boomify(err, {
+			statusCode: !res.statusCode || res.statusCode < 400 ? 500 : res.statusCode,
+			message: err.message,
+		});
 	}
 
 	logger.errorHandler()(err, req, res, (err) => {

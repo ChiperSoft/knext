@@ -1,9 +1,11 @@
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { map } from 'lodash';
 import styles from './index.scss';
+import Box from '../components/Box';
 
-const Page = ({ ctx }) =>
+const Page = ({ ctx }) => (
 	<div className={styles.root}>
 		<h1>This is the front page</h1>
 
@@ -26,7 +28,10 @@ const Page = ({ ctx }) =>
 		<ul>
 			{map(ctx.cookies, (value, key) => <li key={key}><em>{key}</em>: {value}</li>)}
 		</ul>
-	</div>;
+
+		<Box />
+	</div>
+);
 
 Page.propTypes = {
 	ctx: PropTypes.shape({

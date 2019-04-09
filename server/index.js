@@ -5,7 +5,7 @@ var express       = require('express');
 var cookieParser  = require('cookie-parser');
 var bodyParser    = require('body-parser');
 var logger        = require('./log');
-var reactExpress  = require('./react');
+var reactExpress  = require('./page');
 var glob          = require('glob');
 var boom          = require('boom');
 

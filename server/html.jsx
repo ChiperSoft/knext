@@ -1,6 +1,7 @@
 /* eslint react/prefer-stateless-function:0 */
 
-import React, { Component, PropTypes, Children } from 'react';
+import React, { Component, Children } from 'react';
+import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
 
 export default class Html extends Component {
@@ -38,7 +39,7 @@ export default class Html extends Component {
 
 					<script src={assets('/assets/vendor.js')} charSet="UTF-8" />
 					{this.props.pagePath && <script src={assets('/assets/' + this.props.pagePath)} charSet="UTF-8" />}
-					{this.props.pagePath && <link rel="stylesheet" href={assets('/assets/' + this.props.pagePath + '.css')} charSet="UTF-8" />}
+					{this.props.pagePath && <link rel="stylesheet" href={assets(`/assets/${this.props.pagePath}.css`)} charSet="UTF-8" />}
 				</body>
 			</html>
 		);

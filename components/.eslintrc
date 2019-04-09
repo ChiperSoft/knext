@@ -1,7 +1,7 @@
 {
 	"parser": "babel-eslint",
-	"extends": ["chiper/react"],
+	"extends": ["twipped/react"],
 	"rules": {
-		"node/no-unsupported-features": "off"
+		"node/no-unsupported-features/es-syntax": "off"
 	}
 }

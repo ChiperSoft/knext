@@ -1,10 +1,12 @@
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const Page = (props) =>
+const Page = (props) => (
 	<div>
 		<h1>Title: {props.movie.Title}</h1>
-	</div>;
+	</div>
+);
 
 Page.propTypes = {
 	movie: PropTypes.arrayOf(PropTypes.shape({

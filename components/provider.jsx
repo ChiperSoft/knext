@@ -1,6 +1,6 @@
 
-import { Component, PropTypes, Children } from 'react';
-
+import { Component, Children } from 'react';
+import PropTypes from 'prop-types';
 /**
  * Extraction of React-Redux's Provider component, reduced to its core functionality.
  */

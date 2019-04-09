@@ -1,18 +1,20 @@
 'use strict';
 
-var gulp       = require('gulp');
-var gutil      = require('gulp-util');
-var cache      = require('gulp-cached');
-var babel      = require('gulp-babel');
-var sourcemaps = require('gulp-sourcemaps');
-var postcss    = require('gulp-postcss');
-var filter     = require('gulp-filter');
-var concat     = require('gulp-concat');
-var sass       = require('gulp-sass');
-var modules    = require('postcss-modules');
+var gulp         = require('gulp');
+var Vinyl        = require('vinyl');
+var cache        = require('gulp-cached');
+var babel        = require('gulp-babel');
+var sourcemaps   = require('gulp-sourcemaps');
+var postcss      = require('gulp-postcss');
+var filter       = require('gulp-filter');
+var concat       = require('gulp-concat');
+var sass         = require('gulp-sass');
+var modules      = require('postcss-modules');
 var autoprefixer = require('autoprefixer');
-var rename     = require('gulp-rename');
-var rev        = require('gulp-rev');
+var rename       = require('gulp-rename');
+var rev          = require('gulp-rev');
+var gap          = require('gulp-append-prepend');
+const log        = require('fancy-log');
 
 var through    = require('through2');
 var webpack    = require('webpack');
@@ -21,7 +23,7 @@ var forever    = require('forever-monitor');
 var del        = require('del');
 var Path       = require('path');
 
-var webpackConfig = require('./webpack.js');
+var webpackConfig = require('./webpack');
 
 var debug = require('through2').obj(function (file, enc, next) { // eslint-disable-line no-unused-vars
 	var details = Object.assign({ path: file.path, relative: file.relative }, file);
@@ -32,7 +34,7 @@ var debug = require('through2').obj(function (file, enc, next) { // eslint-disab
 
 const SERVER_CODE = '+(server|pages|routes|components|lib)/**/*.js?(x)';
 const CLIENT_CODE = '+(pages|components|webpack)/**/*.js?(x)';
-const CSS_MODULES = '+(pages|components|scss)/**/*.?(s)css';
+// const CSS_MODULES = '+(pages|components|scss)/**/*.?(s)css';
 const CSS_MAIN    = '+(scss)/**/*.?(s)css';
 
 module.exports = exports = {
@@ -51,16 +53,34 @@ module.exports = exports = {
 	},
 
 	compileClient (callback) {
-		webpack(webpackConfig, (err, stats) => { // eslint-disable-line no-unused-vars
-			if (err) throw new gutil.PluginError('webpack', err);
-			// gutil.log('[webpack]', stats.toString());
+		webpack(webpackConfig(''), (err, stats) => { // eslint-disable-line no-unused-vars
+			if (err) {
+				log.error(err.stack || err);
+				if (err.details) {
+					log.error(err.details);
+				}
+				return;
+			}
+
+			const info = stats.toJson();
+
+			if (stats.hasErrors()) {
+				info.errors.forEach(log.error);
+			}
+
+			if (stats.hasWarnings()) {
+				log.warn('WARNINGS', info.warnings);
+			}
+
 			callback();
 		});
 	},
 
 	compileCssMain () {
 		return gulp.src('scss/main.scss')
-			.pipe(sass().on('error', sass.logError))
+			.pipe(sass({
+				includePaths: [ Path.join(__dirname, 'node_modules') ],
+			}).on('error', sass.logError))
 			.pipe(postcss([
 				autoprefixer({
 					browsers: [ 'last 2 versions' ],
@@ -90,10 +110,20 @@ module.exports = exports = {
 		// ex: source/shared/components/header/styles.css
 		return gulp.src('+(pages|components)/**/*.?(s)css')
 
+			.pipe(gap.prependText(`
+				@import "scss/mixins";
+				@import "scss/variables";
+			`))
+
 			// setup sourcemap processing
 			.pipe(sourcemaps.init())
 
-			.pipe(sass().on('error', sass.logError))
+			.pipe(sass({
+				includePaths: [
+					Path.join(__dirname, 'node_modules'),
+					Path.join(__dirname, 'scss'),
+				],
+			}).on('error', sass.logError))
 
 			// This is the meat of the css module processing.
 			// We pass in our callback from above to capture json output
@@ -122,7 +152,7 @@ module.exports = exports = {
 				push(file.clone());
 
 				pending.forEach((item) => {
-					push(new gutil.File({
+					push(new Vinyl({
 						cwd: file.cwd,
 						base: file.base,
 						path: item.path,
@@ -142,13 +172,14 @@ module.exports = exports = {
 				path.basename = `${bn}.scss`;
 			}))
 			.pipe(gulp.dest('dist'))
-			.pipe(fjson.restore)
+			// .pipe(fjson.restore)
 
-			// filter out everything except the css and concat it into a single
-			// modules file that will be hosted publicly.
-			.pipe(fcss)
-			.pipe(concat('modules.css'))
-			.pipe(gulp.dest('dist/public/assets'));
+		// filter out everything except the css and concat it into a single
+		// modules file that will be hosted publicly.
+		// .pipe(fcss)
+		// .pipe(concat('modules.css'))
+		// .pipe(gulp.dest('dist/public/assets'))
+		;
 	},
 
 	copyModels () {
@@ -166,9 +197,6 @@ module.exports = exports = {
 				// Change rev's original base path to the public root so that it uses the full public
 				// path as the original file name key in the manifest, as well as in css substitution
 				file.revOrigBase = Path.join(__dirname, '/dist/public');
-
-				// Change rev's target path to include /rev before the paths.
-				file.path = file.path.replace(Path.join(__dirname, '/dist/public'), Path.join(__dirname, '/dist/public/rev'));
 				file.base = Path.join(__dirname, '/dist/public');
 
 				this.push(file);
