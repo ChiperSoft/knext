@@ -13,7 +13,7 @@ var pages = glob.sync(pathJoin('pages', '**', '*.jsx'), { cwd: __dirname });
 const entry = {};
 const cacheGroups = {};
 for (const p of pages) {
-	entry[p.replace('.jsx', '.js')] = `./webpack/page!${pathJoin('.', p)}`;
+	entry[p.replace('.jsx', '')] = `./webpack/page!${pathJoin('.', p)}`;
 }
 
 cacheGroups.vendor = {
@@ -50,7 +50,7 @@ module.exports = exports = function (env) {
 		resolve,
 		module,
 		optimization: {
-			runtimeChunk: { name: 'runtime.js' },
+			runtimeChunk: { name: 'runtime' },
 			splitChunks: {
 				chunks: 'all',
 				maxInitialRequests: Infinity,
@@ -59,8 +59,6 @@ module.exports = exports = function (env) {
 			},
 		},
 	};
-
-	// console.log(config.optimization.splitChunks);
 
 	return config;
 };
@@ -78,7 +76,7 @@ exports.plugins = [
 
 exports.output = {
 	path: pathResolve(__dirname, 'dist', 'public', 'assets'),
-	filename: '[name]',
+	filename: '[name].js',
 	libraryTarget: 'var',
 };
 
