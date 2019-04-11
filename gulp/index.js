@@ -4,7 +4,7 @@ const forever    = require('forever-monitor');
 const debounce   = require('lodash/debounce');
 const log        = require('fancy-log');
 
-const SERVER_CODE = '+(server|models|pages|routes|components|lib)/**/*.js?(x)';
+const SERVER_CODE = '+(server|models|pages|components|lib)/**/*.js?(x)';
 const CLIENT_CODE = '+(pages|components|webpack)/**/*.js?(x)';
 const CSS_MODULES = '+(pages|components)/**/*.?(s)css';
 const CSS_MAIN    = [ 'scss/*.scss', '!scss/_*.scss' ];
@@ -24,6 +24,9 @@ const ops = {
 
 const clean = require('./clean')(ops);
 exports.clean = clean;
+
+const lint = require('./lint')(ops);
+exports.lint = lint;
 
 const compileServer = require('./compile-server')(ops);
 exports['compile-server'] = compileServer;
