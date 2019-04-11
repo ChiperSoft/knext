@@ -6,19 +6,26 @@ import Helmet from 'react-helmet';
 
 export default class Html extends Component {
 	static propTypes = {
-		assets:       PropTypes.function,
+		manifest:     PropTypes.object, // eslint-disable-line react/forbid-prop-types
 		initialState: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 		pagePath:     PropTypes.string,
 		children:     PropTypes.element.isRequired,
 	};
 
 	render () {
-		const { assets, initialState, children } = this.props;
+		const { manifest, initialState, children } = this.props;
 
 		var head  = Helmet.rewind();
 		var meta  = head.meta.toComponent();
 		var title = head.title.toComponent();
 		var link  = head.link.toComponent();
+
+		function assets (path) {
+			if (path[0] === '/') path = path.substr(1);
+
+			if (manifest[path]) return '/' + manifest[path];
+			return '/' + path;
+		};
 
 		return (
 			<html lang="en-us">

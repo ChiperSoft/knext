@@ -10,21 +10,12 @@ try {
 	manifest = {};
 }
 
-function assets (path) {
-	if (path[0] === '/') path = path.substr(1);
-
-	var lookup = 'rev/' + path;
-
-	if (manifest[lookup]) return '/' + manifest[lookup];
-	return '/' + path;
-};
-
 export function renderer (req, res, next) {
 	if (res.render.isReact) return next();
 
 	res.render = function (Page, store, pagePath) {
 		const node = (
-			<Html assets={assets} initialState={store} pagePath={pagePath}>
+			<Html manifest={manifest} initialState={store} pagePath={pagePath}>
 				<Page {...store} />
 			</Html>
 		);
