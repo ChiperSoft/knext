@@ -32,7 +32,7 @@ var debug = require('through2').obj(function (file, enc, next) { // eslint-disab
 	next();
 });
 
-const SERVER_CODE = '+(server|pages|routes|components|lib)/**/*.js?(x)';
+const SERVER_CODE = '+(server|pages|routes|models|components|lib)/**/*.js?(x)';
 const CLIENT_CODE = '+(pages|components|webpack)/**/*.js?(x)';
 const CSS_MODULES = '+(pages|components)/**/*.?(s)css';
 const CSS_MAIN    = '+(scss)/**/*.?(s)css';
@@ -180,11 +180,6 @@ module.exports = exports = {
 			.pipe(concat('modules.css'))
 			.pipe(gulp.dest('dist/public/assets'))
 		;
-	},
-
-	copyModels () {
-		return gulp.src('models/**/*.js')
-			.pipe(gulp.dest('dist/models'));
 	},
 
 	cachebusting () {
