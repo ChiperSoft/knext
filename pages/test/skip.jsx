@@ -1,10 +1,11 @@
 
 import React from 'react';
 
-const Page = () =>
+const Page = () => (
 	<div>
 		<h1>This should not have rendered.</h1>
-	</div>;
+	</div>
+);
 
 Page.propTypes = {};
 

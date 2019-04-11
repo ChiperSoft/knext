@@ -22,7 +22,7 @@ var app     = require('./dist/server/index');
 var http      = require('http');
 var Promise   = require('bluebird');
 
-log.info(`Current environment is "${process.env.NODE_ENV}"`);
+log.info(`Current environment is "${process.env.NODE_ENV || 'local'}"`);
 
 if (config.isProd) {
 	log.info(config, 'Current configuration');

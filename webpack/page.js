@@ -7,8 +7,8 @@ exports.pitch = function (remainingRequest) {
 	import { render } from 'react-dom';
 	import Page from ${JSON.stringify(remainingRequest)};
 
-	var store = window.__INITIAL_STATE__;
-	window.__INITIAL_STATE__ = null;
+	var store = window.__PAGE_PROPS__;
+	window.__PAGE_PROPS__ = null;
 
 	render(React.createElement(Page, store), document.getElementById('root'));
 	`;

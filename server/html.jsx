@@ -6,14 +6,14 @@ import Helmet from 'react-helmet';
 
 export default class Html extends Component {
 	static propTypes = {
-		manifest:     PropTypes.object, // eslint-disable-line react/forbid-prop-types
-		initialState: PropTypes.object, // eslint-disable-line react/forbid-prop-types
-		pagePath:     PropTypes.string,
-		children:     PropTypes.element.isRequired,
+		manifest:  PropTypes.object, // eslint-disable-line react/forbid-prop-types
+		pageProps: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+		pagePath:  PropTypes.string,
+		children:  PropTypes.element.isRequired,
 	};
 
 	render () {
-		const { manifest, initialState, children } = this.props;
+		const { manifest, pageProps, children, pagePath } = this.props;
 
 		var head  = Helmet.rewind();
 		var meta  = head.meta.toComponent();
@@ -33,7 +33,7 @@ export default class Html extends Component {
 					<link rel="stylesheet" href={assets('/assets/main.css')} />
 					<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 					{title}{meta}{link}
-					{this.props.pagePath && <link rel="stylesheet" href={assets(`/assets/${this.props.pagePath.replace(/\.js$/, '.css')}`)} charSet="UTF-8" />}
+					{pagePath && <link rel="stylesheet" href={assets(`/assets/pages/${pagePath.replace(/\.js$/, '.css')}`)} charSet="UTF-8" />}
 				</head>
 				<body>
 					{/* Content div where the client-side will take over the loading from the server */}
@@ -41,13 +41,13 @@ export default class Html extends Component {
 
 					{/* Inject the state from the server to the client to take over */}
 					<script
-						dangerouslySetInnerHTML={{ __html: `window.__INITIAL_STATE__=${JSON.stringify(initialState)};` }}
+						dangerouslySetInnerHTML={{ __html: `window.__PAGE_PROPS__=${JSON.stringify(pageProps)};` }}
 						charSet="UTF-8"
 					/>
 
 					<script src={assets('/assets/runtime.js')} charSet="UTF-8" />
 					<script src={assets('/assets/vendor.js')} charSet="UTF-8" />
-					{this.props.pagePath && <script src={assets('/assets/' + this.props.pagePath)} charSet="UTF-8" />}
+					{pagePath && <script src={assets('/assets/pages/' + pagePath)} charSet="UTF-8" />}
 				</body>
 			</html>
 		);
