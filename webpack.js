@@ -1,15 +1,31 @@
 'use strict';
 
-var webpack = require('webpack');
-var { join: pathJoin, resolve: pathResolve } = require('path');
-var glob = require('glob');
+const webpack = require('webpack');
+const { join: pathJoin, resolve: pathResolve } = require('path');
+const glob = require('glob');
 
-var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+// We're using crass for css minification. This function hooks into
+// optimize-css-assets-webpack-plugin to override its use of cssnano
+const crass = require('crass');
+const crassProcessor = {
+	process: async (input, options) => {
+		options = { o1: true, pretty: false, ...options };
+		var parsed = crass.parse(input);
+		parsed = parsed.optimize({ O1: !!options.o1 });
+		if (options.pretty) parsed = parsed.pretty();
+		return { css: parsed.toString() };
+	},
+};
+
+
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TerserJSPlugin = require('terser-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
-var babelConfig = require('./babel.config.js').clientSide;
+const babelConfig = require('./babel.config.js').clientSide;
 
-var pages = glob.sync(pathJoin('pages', '**', '*.jsx'), { cwd: __dirname });
+const pages = glob.sync(pathJoin('pages', '**', '*.jsx'), { cwd: __dirname });
 const entry = {};
 const cacheGroups = {};
 for (const p of pages) {
@@ -40,15 +56,108 @@ module.exports = exports = function (env) {
 		mode = 'development';
 	}
 
-	const { plugins, output, resolve, module } = exports;
+	var isProd = mode === 'production';
+
+	/** Define Loader Configs ************************************************************************************* **/
+
+	const cssModuleLoader = {
+		loader: 'css-loader',
+		options: {
+			importLoaders: 2,
+			sourceMap: true,
+			modules: 'global',
+			localIdentName: '[path][name]--[local]',
+		},
+	};
+
+	const postCssLoader = {
+		loader: 'postcss-loader',
+		options: {
+			sourceMap: 'inline',
+			plugins: () => [
+				require('autoprefixer'),
+			],
+		},
+	};
+
+	const sassLoader = {
+		loader: 'sass-loader',
+		options: {
+			includePaths: [
+				pathJoin(__dirname, 'node_modules'),
+				pathJoin(__dirname, 'scss'),
+			],
+			data: `
+				@import "scss/mixins";
+				@import "scss/variables";
+			`,
+		},
+	};
+
+	/** Setup Loader Rulesets ************************************************************************************* **/
+
+	var rules = [];
+
+	rules.push({
+		test: /\.jsx?$/,
+		resolve: {
+			extensions: [ '.js', '.jsx', '.json' ],
+		},
+		use: [
+			{
+				loader: 'babel-loader',
+				options: babelConfig,
+			},
+		],
+	});
+
+	rules.push({
+		test: /\.css$/,
+		use: [
+			MiniCssExtractPlugin.loader,
+			'css-loader',
+		],
+	});
+
+	rules.push({
+		test: /\.scss$/,
+		use: [
+			MiniCssExtractPlugin.loader,
+			cssModuleLoader,
+			postCssLoader,
+			sassLoader,
+		],
+	});
+
+	const plugins = [
+		new LodashModuleReplacementPlugin({
+			collections: true,
+			paths: true,
+		}),
+		new webpack.DefinePlugin({
+			'process.env.BUILD_DATE': JSON.stringify(new Date()),
+		}),
+		new MiniCssExtractPlugin(),
+	];
+
+	/** Generate Final Config ************************************************************************************* **/
 
 	const config = {
 		mode,
 		entry,
 		plugins,
-		output,
-		resolve,
-		module,
+		output: {
+			path: pathResolve(__dirname, 'dist', 'public', 'assets'),
+			filename: '[name].js',
+			libraryTarget: 'var',
+		},
+		resolve: {
+			modules: [
+				__dirname,
+				pathJoin(__dirname, 'node_modules'),
+			],
+		},
+		module: { rules },
 		optimization: {
 			runtimeChunk: { name: 'runtime' },
 			splitChunks: {
@@ -57,97 +166,31 @@ module.exports = exports = function (env) {
 				minSize: 0,
 				cacheGroups,
 			},
+			minimize: isProd,
+			minimizer: [
+				new TerserJSPlugin({
+					terserOptions: {
+						warnings: false,
+						compress: {
+							comparisons: false,
+						},
+						parse: {},
+						mangle: true,
+						output: {
+							comments: false,
+							ascii_only: true,
+						},
+					},
+					parallel: true,
+					cache: true,
+					sourceMap: true,
+				}),
+				new OptimizeCSSAssetsPlugin({
+					cssProcessor: crassProcessor,
+				}),
+			],
 		},
 	};
 
 	return config;
-};
-
-exports.plugins = [
-	new LodashModuleReplacementPlugin({
-		collections: true,
-		paths: true,
-	}),
-	new webpack.DefinePlugin({
-		'process.env.BUILD_DATE': JSON.stringify(new Date()),
-	}),
-	new MiniCssExtractPlugin(),
-];
-
-exports.output = {
-	path: pathResolve(__dirname, 'dist', 'public', 'assets'),
-	filename: '[name].js',
-	libraryTarget: 'var',
-};
-
-exports.resolve = {
-	modules: [
-		__dirname,
-		pathJoin(__dirname, 'node_modules'),
-	],
-};
-
-exports.module = {
-	rules: [
-		{
-			test: /\.css$/,
-			use: [
-				MiniCssExtractPlugin.loader,
-				'css-loader',
-			],
-		},
-		{
-			test: /\.scss$/,
-			use: [
-
-				MiniCssExtractPlugin.loader,
-				// {
-				// 	loader: pathJoin(__dirname, 'webpack/debug-loader'),
-				// },
-				{
-					loader: 'css-loader',
-					options: {
-						importLoaders: 2,
-						sourceMap: true,
-						modules: 'global',
-						localIdentName: '[path][name]--[local]',
-					},
-				},
-				{
-					loader: 'postcss-loader',
-					options: {
-						sourceMap: 'inline',
-						plugins: () => [
-							require('autoprefixer'),
-						],
-					},
-				},
-				{
-					loader: 'sass-loader',
-					options: {
-						includePaths: [
-							pathJoin(__dirname, 'node_modules'),
-							pathJoin(__dirname, 'scss'),
-						],
-						data: `
-							@import "scss/mixins";
-							@import "scss/variables";
-						`,
-					},
-				},
-			],
-		},
-		{
-			test: /\.jsx?$/,
-			resolve: {
-				extensions: [ '.js', '.jsx', '.json' ],
-			},
-			use: [
-				{
-					loader: 'babel-loader',
-					options: babelConfig,
-				},
-			],
-		},
-	],
 };
