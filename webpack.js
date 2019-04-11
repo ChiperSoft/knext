@@ -1,7 +1,7 @@
 'use strict';
 
 const webpack = require('webpack');
-const { join: pathJoin, resolve: pathResolve } = require('path');
+const { join: pathJoin, resolve: pathResolve, basename } = require('path');
 const glob = require('glob');
 
 // We're using crass for css minification. This function hooks into
@@ -25,10 +25,12 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 const babelConfig = require('./babel.config.js').clientSide;
 
-const pages = glob.sync(pathJoin('pages', '**', '*.jsx'), { cwd: __dirname });
+const pages = glob.sync('pages/**/*.jsx', { cwd: __dirname });
 const entry = {};
 const cacheGroups = {};
 for (const p of pages) {
+	// skip anything starting with an underscore, as those are server side only pages
+	if (basename(p)[0] === '_') continue;
 	entry[p.replace('.jsx', '')] = `./webpack/page!${pathJoin('.', p)}`;
 }
 
@@ -135,6 +137,7 @@ module.exports = exports = function (env) {
 			paths: true,
 		}),
 		new webpack.DefinePlugin({
+			'process.env.NODE_ENV': mode,
 			'process.env.BUILD_DATE': JSON.stringify(new Date()),
 		}),
 		new MiniCssExtractPlugin(),
