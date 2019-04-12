@@ -151,6 +151,7 @@ module.exports = exports = function (env) {
 		plugins,
 		output: {
 			path: pathResolve(__dirname, 'dist', 'public', 'assets'),
+			publicPath: '/assets/',
 			filename: '[name].js',
 			libraryTarget: 'var',
 		},

@@ -88,28 +88,21 @@ function server () {
 
 function watcher () {
 	const reload = server();
+	const bounceServer = (cb) => reload(cb);
 
 	watch(SERVER_CODE, series(
-		compileServer,
-		reload
+		compileServer
+		, bounceServer
 	));
 
 	watch([ '+(pages|components)/**/*.?(s)css', 'scss/_variables.scss', 'scss/_mixins.scss' ], series(
-		parallel(
-			compileCssModules,
-			compileClient
-		),
-		reload
-	));
-
-	watch([ 'scss/_variables.scss', 'scss/_mixins.scss' ], parallel(
-		compileCssModules,
-		compileClient
+		compileCssModules
+		, bounceServer
 	));
 
 	watch('scss/**/*.?(s)css', compileSiteCss);
 
-	watch(CLIENT_CODE, compileClient);
+	compileClient.watch();
 };
 
 exports.default = series(clean, compileDev);

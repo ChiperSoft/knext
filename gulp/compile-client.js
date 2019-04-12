@@ -3,6 +3,7 @@ const PluginError   = require('plugin-error');
 const webpack       = require('webpack');
 const webpackConfig = require('../webpack');
 const log           = require('fancy-log');
+const filter        = require('lodash/filter');
 
 module.exports = exports = () => {
 
@@ -39,6 +40,34 @@ module.exports = exports = () => {
 
 	compileClient.prod = function compileClientForProd () {
 		return runWebpack('production');
+	};
+
+	compileClient.watch = function compileClientAndWatch () {
+		const compiler = webpack(webpackConfig('development'));
+		return compiler.watch({
+			aggregateTimeout: 300,
+			logger: log,
+		}, (err, stats) => {
+			if (err) {
+				log.error(err.stack || err);
+				if (err.details) {
+					log.error(err.details);
+				}
+			}
+
+			const info = stats.toJson();
+
+			if (stats.hasErrors()) {
+				info.errors.forEach(log.error);
+			}
+
+			if (stats.hasWarnings()) {
+				log.warn('WARNINGS', info.warnings);
+			}
+
+			const built = filter(info.assets, 'emitted').map((a) => a.name)
+			log.info(`Finished 'compileClient' after ${info.time} ms\n  ${built.join('\n  ')}`);
+		});
 	};
 
 	return compileClient;

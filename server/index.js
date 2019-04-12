@@ -3,9 +3,7 @@ var { resolve }   = require('path');
 var express       = require('express');
 var cookieParser  = require('cookie-parser');
 var bodyParser    = require('body-parser');
-var logger        = require('./middleware/logger');
 var boom          = require('boom');
-
 
 var app = module.exports = exports = express();
 
