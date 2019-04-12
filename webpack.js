@@ -137,7 +137,7 @@ module.exports = exports = function (env) {
 			paths: true,
 		}),
 		new webpack.DefinePlugin({
-			'process.env.NODE_ENV': mode,
+			'process.env.NODE_ENV': JSON.stringify(mode),
 			'process.env.BUILD_DATE': JSON.stringify(new Date()),
 		}),
 		new MiniCssExtractPlugin(),
