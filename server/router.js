@@ -3,10 +3,12 @@ var { resolve, join, relative } = require('path');
 const { existsSync } = require('fs');
 const glob  = require('glob');
 const log   = require('./log')('server/router');
+const renderHtml = require('./render-html');
+
 
 const React = require('react');
 const { renderToStaticMarkup } = require('react-dom/server');
-const Html = require('./html');
+const { HelmetProvider } = require('react-helmet-async');
 
 var manifest = {};
 try {
@@ -22,12 +24,23 @@ router.use(function renderer (req, res, next) {
 	if (res.render.isReact) return next();
 
 	res.render = function (Page, pageProps, pagePath) {
-		const node = React.createElement(
-			Html.default, { manifest, pageProps, pagePath },
+
+		const helmetContext = {};
+		const App = React.createElement(
+			HelmetProvider, { context: helmetContext },
 			React.createElement(Page, pageProps)
 		);
 
-		var html = '<!DOCTYPE html>' + renderToStaticMarkup(node);
+		const rendered = renderToStaticMarkup(App);
+
+		const html = renderHtml({
+			helmet: helmetContext.helmet,
+			rendered,
+			manifest,
+			pageProps,
+			pagePath,
+		});
+
 		res.send(html);
 	};
 
